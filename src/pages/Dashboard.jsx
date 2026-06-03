@@ -27,6 +27,7 @@ export default function Dashboard() {
   const [expensePage, setExpensePage] = useState(1);
   const [receiptModal, setReceiptModal] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
   const [lastRefresh, setLastRefresh] = useState(new Date());
 
   const fetchAll = useCallback(async () => {
@@ -43,9 +44,10 @@ export default function Dashboard() {
       setSummary(s);
       setContributions(c);
       setExpenses(e);
+      setFetchError(false);
       setLastRefresh(new Date());
-    } catch (err) {
-      console.error(err);
+    } catch {
+      setFetchError(true);
     } finally {
       setLoading(false);
     }
@@ -73,6 +75,23 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <p className="text-gray-400">Memuat data...</p>
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600 font-medium">Gagal memuat data</p>
+          <p className="text-gray-400 text-sm mt-1">Periksa koneksi internet Anda</p>
+          <button
+            onClick={fetchAll}
+            className="mt-4 text-sm text-blue-600 hover:underline"
+          >
+            Coba lagi
+          </button>
+        </div>
       </div>
     );
   }
