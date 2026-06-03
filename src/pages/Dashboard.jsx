@@ -64,13 +64,13 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Hero — full width */}
-      <div className="bg-gradient-to-br from-blue-800 to-blue-600 px-5 pt-5 pb-5 text-white text-center">
-        <p className="text-xs text-blue-200">Karang Taruna Pengeteh Keker · RT 22/06</p>
-        <p className="text-xs text-blue-200 mt-0.5 mb-1">Total Dana Terkumpul</p>
-        <p className="text-3xl font-extrabold tracking-tight">
+      <div className="bg-gradient-to-br from-blue-800 to-blue-600 px-5 pt-7 pb-6 text-white text-center">
+        <p className="text-xs text-blue-200 mb-1">Karang Taruna Pengeteh Keker · RT 22/06</p>
+        <p className="text-sm text-blue-200 mb-2">Total Dana Terkumpul</p>
+        <p className="text-4xl font-extrabold tracking-tight">
           {formatRupiah(summary?.totalIncome || 0)}
         </p>
-        <p className="text-xs text-blue-300 mt-1">
+        <p className="text-xs text-blue-300 mt-2">
           dari {leaderboard.length} donatur · diperbarui otomatis
         </p>
       </div>
