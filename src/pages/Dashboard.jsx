@@ -64,7 +64,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Hero — full width */}
-      <div className="bg-gradient-to-br from-blue-800 to-blue-600 px-5 pt-12 pb-8 text-white text-center">
+      <div className="bg-gradient-to-br from-blue-800 to-blue-600 px-5 pt-7 pb-6 text-white text-center">
         <p className="text-xs text-blue-200 mb-1">Karang Taruna Pengeteh Keker · RT 22/06</p>
         <p className="text-sm text-blue-200 mb-2">Total Dana Terkumpul</p>
         <p className="text-4xl font-extrabold tracking-tight">
