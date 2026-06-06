@@ -425,7 +425,7 @@ export default function FormIuran() {
                   name="catatan"
                   value={form.catatan}
                   onChange={handleChange}
-                  placeholder="Contoh: Dukungan bulan Juni 2026"
+                  placeholder="Contoh: dukungan bulan Juni 2026"
                   rows={2}
                   className="input resize-none"
                 />

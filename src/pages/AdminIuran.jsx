@@ -242,7 +242,7 @@ export default function AdminIuran() {
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               rows={3}
-              placeholder="Contoh: Bukti transfer tidak terbaca / nominal tidak sesuai"
+              placeholder="Contoh: bukti transfer tidak terbaca / nominal tidak sesuai"
               className="input resize-none"
             />
             <div className="flex gap-2 mt-4">

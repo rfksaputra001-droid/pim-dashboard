@@ -137,7 +137,7 @@ export default function AdminPengeluaran() {
                   type="text"
                   value={form.keterangan}
                   onChange={(e) => setForm((f) => ({ ...f, keterangan: e.target.value }))}
-                  placeholder="Contoh: Beli cat tembok 5 kg"
+                  placeholder="Contoh: beli cat tembok 5 kg"
                   className="input"
                   required
                 />
