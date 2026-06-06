@@ -112,18 +112,13 @@ export default function Pengeluaran() {
       {/* Modal detail + bukti nota */}
       {selected && (
         <div
-          className="fixed inset-0 bg-black/60 z-50 flex items-end justify-center"
+          className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
           onClick={() => setSelected(null)}
         >
           <div
-            className="bg-white w-full max-w-md rounded-t-3xl overflow-hidden"
+            className="bg-white w-full max-w-md rounded-3xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Handle bar */}
-            <div className="flex justify-center pt-3 pb-1">
-              <div className="w-10 h-1 bg-gray-200 rounded-full" />
-            </div>
-
             {/* Info */}
             <div className="px-5 py-4 border-b border-gray-100">
               <div className="flex items-start justify-between gap-3">
