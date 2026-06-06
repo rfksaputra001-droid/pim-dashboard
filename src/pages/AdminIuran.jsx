@@ -292,12 +292,11 @@ export default function AdminIuran() {
                   <p className="text-xs text-gray-400">{proofModal.name} · {formatRupiah(proofModal.amount)}</p>
                 </div>
               </div>
-              <button
+              <Icon
+                icon="solar:close-square-bold"
+                className="text-2xl text-gray-400 hover:text-gray-600 cursor-pointer"
                 onClick={() => setProofModal(null)}
-                className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200"
-              >
-                <Icon icon="solar:close-square-bold" className="text-base" />
-              </button>
+              />
             </div>
             <div className="p-4">
               {proofModal.url.includes('.pdf') ? (
