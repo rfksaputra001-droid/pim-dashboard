@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../utils/api.js';
 import { compressImage } from '../utils/imageCompressor.js';
 import { formatRupiah } from '../utils/format.js';
+import qrisImage from '../assets/QRIS.png';
 
 const BANKS = [
   { id: 'mandiri', nama: 'Bank Mandiri', noRekening: null,          atasNama: null },
@@ -306,12 +307,7 @@ export default function FormIuran() {
               {/* QRIS */}
               {payMethod === 'qris' && (
                 <div className="bg-gray-50 rounded-2xl p-4 text-center">
-                  <div className="w-44 h-44 bg-white rounded-2xl border border-gray-200 mx-auto flex items-center justify-center mb-3 shadow-sm">
-                    <div className="text-center">
-                      <p className="text-5xl">▦</p>
-                      <p className="text-xs text-gray-400 mt-1 font-medium">QRIS Dummy</p>
-                    </div>
-                  </div>
+                  <img src={qrisImage} alt="QRIS" className="w-44 h-44 object-contain mx-auto mb-3 rounded-2xl" />
                   <p className="text-sm font-bold text-gray-800">Karang Taruna RT 22/06</p>
                   <p className="text-xs text-gray-400 mt-0.5">Scan · Semua e-wallet & m-banking</p>
                 </div>
