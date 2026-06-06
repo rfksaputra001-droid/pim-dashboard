@@ -17,6 +17,7 @@ export default function Pengeluaran() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState(null);
 
   const fetchExpenses = useCallback(async () => {
     setLoading(true);
@@ -61,7 +62,11 @@ export default function Pengeluaran() {
           ) : (
             <div className="divide-y divide-gray-50">
               {expenses.map((e) => (
-                <div key={e.id} className="flex items-start gap-3 px-5 py-4">
+                <button
+                  key={e.id}
+                  onClick={() => setSelected(e)}
+                  className="w-full flex items-start gap-3 px-5 py-4 hover:bg-gray-50/80 active:bg-gray-100 transition-colors text-left"
+                >
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-gray-800">{e.description}</p>
                     <div className="flex items-center gap-2 mt-1">
@@ -71,10 +76,11 @@ export default function Pengeluaran() {
                       </span>
                     </div>
                   </div>
-                  <span className="text-sm font-bold text-red-500 whitespace-nowrap">
-                    -{formatRupiah(e.amount)}
-                  </span>
-                </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-sm font-bold text-red-500">-{formatRupiah(e.amount)}</span>
+                    <span className="text-gray-300 text-sm">›</span>
+                  </div>
+                </button>
               ))}
             </div>
           )}
@@ -102,6 +108,76 @@ export default function Pengeluaran() {
         )}
 
       </main>
+
+      {/* Modal detail + bukti nota */}
+      {selected && (
+        <div
+          className="fixed inset-0 bg-black/60 z-50 flex items-end justify-center"
+          onClick={() => setSelected(null)}
+        >
+          <div
+            className="bg-white w-full max-w-md rounded-t-3xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Handle bar */}
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="w-10 h-1 bg-gray-200 rounded-full" />
+            </div>
+
+            {/* Info */}
+            <div className="px-5 py-4 border-b border-gray-100">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-gray-900 text-base">{selected.description}</p>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <span className="text-xs text-gray-400">{formatDateShort(selected.date)}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${CATEGORY_COLORS[selected.category]}`}>
+                      {CATEGORY_LABELS[selected.category]}
+                    </span>
+                  </div>
+                </div>
+                <span className="text-lg font-black text-red-500 whitespace-nowrap">
+                  -{formatRupiah(selected.amount)}
+                </span>
+              </div>
+            </div>
+
+            {/* Bukti nota */}
+            <div className="px-5 py-4">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">Bukti Nota / Struk</p>
+              {selected.receiptImageUrl ? (
+                selected.receiptImageUrl.includes('.pdf') ? (
+                  <a
+                    href={selected.receiptImageUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-center gap-2 w-full bg-indigo-50 text-indigo-600 font-semibold py-3 rounded-2xl text-sm"
+                  >
+                    📄 Buka PDF
+                  </a>
+                ) : (
+                  <img
+                    src={selected.receiptImageUrl}
+                    alt="Bukti nota"
+                    className="w-full max-h-72 object-contain rounded-2xl bg-gray-50"
+                  />
+                )
+              ) : (
+                <p className="text-center text-gray-400 text-sm py-6">Tidak ada bukti</p>
+              )}
+            </div>
+
+            <div className="px-5 pb-6">
+              <button
+                onClick={() => setSelected(null)}
+                className="w-full bg-gray-100 text-gray-600 font-semibold py-3 rounded-2xl text-sm hover:bg-gray-200 transition-colors"
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
