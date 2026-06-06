@@ -268,7 +268,7 @@ export default function FormIuran() {
 
               <div>
                 <p className="text-xs text-gray-400 mb-2 font-medium">Pilih cepat:</p>
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                   {QUICK_AMOUNTS.map((amt) => (
                     <button
                       key={amt}

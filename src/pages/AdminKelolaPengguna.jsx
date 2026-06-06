@@ -148,6 +148,7 @@ export default function AdminKelolaPengguna() {
         )}
 
         <div className="card overflow-hidden">
+          <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-xs text-gray-500 uppercase">
               <tr>
@@ -220,6 +221,7 @@ export default function AdminKelolaPengguna() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
 
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
