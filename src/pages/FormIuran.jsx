@@ -310,6 +310,13 @@ export default function FormIuran() {
                   <img src={qrisImage} alt="QRIS" className="w-44 h-44 object-contain mx-auto mb-3 rounded-2xl" />
                   <p className="text-sm font-bold text-gray-800">Karang Taruna RT 22/06</p>
                   <p className="text-xs text-gray-400 mt-0.5">Scan · Semua e-wallet & m-banking</p>
+                  <a
+                    href={qrisImage}
+                    download="QRIS-KarangTaruna.png"
+                    className="inline-flex items-center gap-1.5 mt-3 text-xs font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-xl transition-colors"
+                  >
+                    ↓ Download QRIS
+                  </a>
                 </div>
               )}
 
