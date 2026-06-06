@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import AdminNav from '../components/AdminNav.jsx';
+import AdminLayout from '../components/AdminLayout.jsx';
 import { api } from '../utils/api.js';
 import { formatRupiah, formatDateShort, STATUS_LABELS, STATUS_COLORS } from '../utils/format.js';
+import { Icon } from '@iconify/react';
 
 const STATUSES = ['', 'PENDING', 'VERIFIED', 'REJECTED'];
 
@@ -76,17 +77,25 @@ export default function AdminIuran() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <AdminNav />
-      <main className="max-w-6xl mx-auto px-4 py-6 space-y-4">
+    <AdminLayout>
+      <main className="px-6 py-6 space-y-5">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-bold text-gray-900">Manajemen Donasi</h1>
-            <p className="text-xs text-gray-400">{contributions.total} total transaksi</p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center">
+              <Icon icon="solar:wallet-money-bold" className="text-indigo-600 text-xl" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-gray-900">Manajemen Donasi</h1>
+              <p className="text-xs text-gray-400">{contributions.total} total transaksi</p>
+            </div>
           </div>
-          <button onClick={handleExport} className="btn-ghost text-xs">
-            ⬇ Export CSV
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 px-3 py-2 rounded-xl hover:bg-gray-50 transition-colors"
+          >
+            <Icon icon="solar:download-minimalistic-bold" className="text-base" />
+            Export CSV
           </button>
         </div>
 
@@ -98,8 +107,8 @@ export default function AdminIuran() {
               onClick={() => { setFilterStatus(s); setPage(1); }}
               className={`text-xs px-3 py-1.5 rounded-full font-medium border transition-colors ${
                 filterStatus === s
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-indigo-300 hover:text-indigo-600'
               }`}
             >
               {s === '' ? 'Semua' : STATUS_LABELS[s]}
@@ -125,16 +134,25 @@ export default function AdminIuran() {
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {loading ? (
-                  <tr><td colSpan={8} className="px-4 py-8 text-center text-gray-400">Memuat...</td></tr>
+                  <tr>
+                    <td colSpan={8} className="px-4 py-10 text-center">
+                      <Icon icon="solar:spinner-bold" className="text-2xl animate-spin text-gray-300 mx-auto" />
+                    </td>
+                  </tr>
                 ) : contributions.data.length === 0 ? (
-                  <tr><td colSpan={8} className="px-4 py-8 text-center text-gray-400">Tidak ada data</td></tr>
+                  <tr>
+                    <td colSpan={8} className="px-4 py-10 text-center text-gray-400">
+                      <Icon icon="solar:inbox-bold" className="text-3xl mx-auto mb-2 text-gray-300" />
+                      <p className="text-sm">Tidak ada data</p>
+                    </td>
+                  </tr>
                 ) : contributions.data.map((c) => (
-                  <tr key={c.id} className="hover:bg-gray-50">
+                  <tr key={c.id} className="hover:bg-gray-50/80">
                     <td className="px-4 py-3 text-gray-500 whitespace-nowrap text-xs">
                       {formatDateShort(c.createdAt)}
                     </td>
                     <td className="px-4 py-3 font-medium">{c.name}</td>
-                    <td className="px-4 py-3 text-gray-600 text-xs">{c.phone}</td>
+                    <td className="px-4 py-3 text-gray-500 text-xs">{c.phone}</td>
                     <td className="px-4 py-3 text-right font-semibold text-green-700 whitespace-nowrap">
                       {formatRupiah(c.amount)}
                     </td>
@@ -154,26 +172,29 @@ export default function AdminIuran() {
                     <td className="px-4 py-3 text-center">
                       <button
                         onClick={() => setProofModal(c.proofImageUrl)}
-                        className="text-xs text-blue-600 hover:underline"
+                        className="inline-flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-700 font-medium"
                       >
+                        <Icon icon="solar:eye-bold" className="text-sm" />
                         Lihat
                       </button>
                     </td>
                     <td className="px-4 py-3">
                       {c.status === 'PENDING' && (
-                        <div className="flex gap-1 justify-center">
+                        <div className="flex gap-1.5 justify-center">
                           <button
                             onClick={() => handleVerify(c.id)}
                             disabled={actionLoading === c.id + '-verify'}
-                            className="btn-success text-xs px-2 py-1"
+                            title="Verifikasi"
+                            className="w-8 h-8 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 flex items-center justify-center transition-colors disabled:opacity-50"
                           >
-                            ✓ Verifikasi
+                            <Icon icon="solar:check-circle-bold" className="text-lg" />
                           </button>
                           <button
                             onClick={() => { setRejectModal(c.id); setRejectReason(''); }}
-                            className="btn-danger text-xs px-2 py-1"
+                            title="Tolak"
+                            className="w-8 h-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 flex items-center justify-center transition-colors"
                           >
-                            ✗ Tolak
+                            <Icon icon="solar:close-circle-bold" className="text-lg" />
                           </button>
                         </div>
                       )}
@@ -185,10 +206,22 @@ export default function AdminIuran() {
           </div>
 
           {contributions.totalPages > 1 && (
-            <div className="p-4 flex justify-center gap-2 border-t border-gray-50">
-              <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)} className="btn-ghost text-xs">← Sebelumnya</button>
-              <span className="text-xs text-gray-500 py-2">{page} / {contributions.totalPages}</span>
-              <button disabled={page >= contributions.totalPages} onClick={() => setPage((p) => p + 1)} className="btn-ghost text-xs">Berikutnya →</button>
+            <div className="p-4 flex justify-center items-center gap-3 border-t border-gray-50">
+              <button
+                disabled={page <= 1}
+                onClick={() => setPage((p) => p - 1)}
+                className="w-8 h-8 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <Icon icon="solar:arrow-left-linear" />
+              </button>
+              <span className="text-xs text-gray-500">{page} / {contributions.totalPages}</span>
+              <button
+                disabled={page >= contributions.totalPages}
+                onClick={() => setPage((p) => p + 1)}
+                className="w-8 h-8 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <Icon icon="solar:arrow-right-linear" />
+              </button>
             </div>
           )}
         </div>
@@ -197,8 +230,13 @@ export default function AdminIuran() {
       {/* Modal Reject */}
       {rejectModal && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm p-6">
-            <h3 className="font-semibold mb-3">Tolak Pembayaran</h3>
+          <div className="bg-white rounded-3xl w-full max-w-sm p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-2xl bg-red-50 flex items-center justify-center">
+                <Icon icon="solar:close-circle-bold" className="text-red-500 text-xl" />
+              </div>
+              <h3 className="font-bold text-gray-900">Tolak Pembayaran</h3>
+            </div>
             <label className="label">Alasan Penolakan</label>
             <textarea
               value={rejectReason}
@@ -220,10 +258,12 @@ export default function AdminIuran() {
       {/* Modal WA Link */}
       {waLink && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm p-6 text-center">
-            <div className="text-4xl mb-3">💬</div>
-            <h3 className="font-semibold mb-2">Kirim Notifikasi ke Warga</h3>
-            <p className="text-sm text-gray-600 mb-4">Klik tombol di bawah untuk membuka WhatsApp dan kirim notifikasi ke warga.</p>
+          <div className="bg-white rounded-3xl w-full max-w-sm p-6 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-green-50 flex items-center justify-center mx-auto mb-4">
+              <Icon icon="solar:chat-round-call-bold" className="text-green-500 text-2xl" />
+            </div>
+            <h3 className="font-bold text-gray-900 mb-2">Kirim Notifikasi ke Warga</h3>
+            <p className="text-sm text-gray-500 mb-5">Klik tombol di bawah untuk membuka WhatsApp dan kirim notifikasi ke warga.</p>
             <a
               href={waLink}
               target="_blank"
@@ -233,9 +273,7 @@ export default function AdminIuran() {
             >
               Buka WhatsApp
             </a>
-            <button onClick={() => setWaLink(null)} className="btn-ghost w-full text-sm">
-              Lewati
-            </button>
+            <button onClick={() => setWaLink(null)} className="btn-ghost w-full text-sm">Lewati</button>
           </div>
         </div>
       )}
@@ -243,10 +281,18 @@ export default function AdminIuran() {
       {/* Modal Bukti */}
       {proofModal && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={() => setProofModal(null)}>
-          <div className="bg-white rounded-2xl max-w-lg w-full overflow-hidden" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-3xl max-w-lg w-full overflow-hidden" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between p-4 border-b">
-              <h3 className="font-semibold">Bukti Transfer</h3>
-              <button onClick={() => setProofModal(null)} className="text-gray-400 text-xl">×</button>
+              <div className="flex items-center gap-2">
+                <Icon icon="solar:document-bold" className="text-gray-400 text-lg" />
+                <h3 className="font-semibold text-gray-900">Bukti Transfer</h3>
+              </div>
+              <button
+                onClick={() => setProofModal(null)}
+                className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200"
+              >
+                <Icon icon="solar:close-linear" className="text-lg" />
+              </button>
             </div>
             <div className="p-4">
               {proofModal.includes('.pdf') ? (
@@ -254,12 +300,12 @@ export default function AdminIuran() {
                   Buka PDF
                 </a>
               ) : (
-                <img src={proofModal} alt="Bukti" className="w-full rounded-xl" />
+                <img src={proofModal} alt="Bukti" className="w-full rounded-2xl" />
               )}
             </div>
           </div>
         </div>
       )}
-    </div>
+    </AdminLayout>
   );
 }

@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import AdminNav from '../components/AdminNav.jsx';
+import AdminLayout from '../components/AdminLayout.jsx';
 import { api } from '../utils/api.js';
 import { formatRupiah, formatDateShort, CATEGORY_LABELS } from '../utils/format.js';
 import { compressImage } from '../utils/imageCompressor.js';
+import { Icon } from '@iconify/react';
 
 const CATEGORIES = ['OPERASIONAL', 'KEGIATAN', 'PERALATAN', 'LAIN_LAIN'];
 
@@ -44,7 +45,6 @@ export default function AdminPengeluaran() {
     const raw = e.target.files[0];
     if (!raw) return;
     if (raw.size > 10 * 1024 * 1024) { setError('Ukuran file maksimal 10 MB'); return; }
-
     setCompressing(true);
     setError('');
     try {
@@ -62,13 +62,10 @@ export default function AdminPengeluaran() {
     e.preventDefault();
     setError('');
     setSuccess('');
-
     if (!file) return setError('Foto nota wajib diupload');
-
     const amount = parseInt(form.nominal.replace(/\D/g, ''));
     if (!amount || amount < 1) return setError('Nominal tidak valid');
     if (!form.keterangan.trim()) return setError('Keterangan wajib diisi');
-
     setSubmitting(true);
     try {
       const formData = new FormData();
@@ -77,7 +74,6 @@ export default function AdminPengeluaran() {
       formData.append('kategori', form.kategori);
       formData.append('nominal', String(amount));
       formData.append('fotoNota', file);
-
       await api.postForm('/admin/expenses', formData);
       setSuccess('Pengeluaran berhasil disimpan!');
       setForm(EMPTY_FORM);
@@ -97,18 +93,32 @@ export default function AdminPengeluaran() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <AdminNav />
-      <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
-        <h1 className="text-lg font-bold text-gray-900">Manajemen Pengeluaran</h1>
+    <AdminLayout>
+      <main className="px-6 py-6 space-y-6">
+        {/* Header */}
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-orange-50 flex items-center justify-center">
+            <Icon icon="solar:bill-list-bold" className="text-orange-500 text-xl" />
+          </div>
+          <div>
+            <h1 className="text-lg font-bold text-gray-900">Manajemen Pengeluaran</h1>
+            <p className="text-xs text-gray-400">{expenses.total} transaksi tercatat</p>
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Form Tambah */}
+          {/* Form */}
           <div className="card p-5">
-            <h2 className="font-semibold text-gray-800 mb-4">Tambah Pengeluaran</h2>
+            <h2 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <Icon icon="solar:add-circle-bold" className="text-indigo-500 text-lg" />
+              Tambah Pengeluaran
+            </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="label">Tanggal Transaksi</label>
+                <label className="label">
+                  <Icon icon="solar:calendar-bold" className="inline mr-1 text-gray-400 text-sm" />
+                  Tanggal Transaksi
+                </label>
                 <input
                   type="date"
                   value={form.tanggal}
@@ -119,7 +129,10 @@ export default function AdminPengeluaran() {
               </div>
 
               <div>
-                <label className="label">Keterangan</label>
+                <label className="label">
+                  <Icon icon="solar:document-text-bold" className="inline mr-1 text-gray-400 text-sm" />
+                  Keterangan
+                </label>
                 <input
                   type="text"
                   value={form.keterangan}
@@ -131,7 +144,10 @@ export default function AdminPengeluaran() {
               </div>
 
               <div>
-                <label className="label">Kategori</label>
+                <label className="label">
+                  <Icon icon="solar:tag-bold" className="inline mr-1 text-gray-400 text-sm" />
+                  Kategori
+                </label>
                 <select
                   value={form.kategori}
                   onChange={(e) => setForm((f) => ({ ...f, kategori: e.target.value }))}
@@ -144,7 +160,10 @@ export default function AdminPengeluaran() {
               </div>
 
               <div>
-                <label className="label">Nominal</label>
+                <label className="label">
+                  <Icon icon="solar:tag-price-bold" className="inline mr-1 text-gray-400 text-sm" />
+                  Nominal
+                </label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">Rp</span>
                   <input
@@ -160,20 +179,29 @@ export default function AdminPengeluaran() {
               </div>
 
               <div>
-                <label className="label">Foto Nota / Struk</label>
-                <label className="block border-2 border-dashed border-gray-300 rounded-xl p-4 cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors text-center">
+                <label className="label">
+                  <Icon icon="solar:gallery-add-bold" className="inline mr-1 text-gray-400 text-sm" />
+                  Foto Nota / Struk
+                </label>
+                <label className="block border-2 border-dashed border-gray-300 rounded-2xl p-4 cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/30 transition-colors text-center">
                   <input type="file" accept="image/*,.pdf" onChange={handleFile} className="hidden" />
                   {compressing ? (
-                    <p className="text-sm text-gray-500">Memproses...</p>
+                    <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+                      <Icon icon="solar:spinner-bold" className="text-xl animate-spin" />
+                      Memproses...
+                    </div>
                   ) : filePreview ? (
                     filePreview === 'pdf' ? (
-                      <p className="text-sm text-gray-700">📄 PDF dipilih ✓</p>
+                      <div className="flex items-center justify-center gap-2 text-sm text-gray-700">
+                        <Icon icon="solar:document-bold" className="text-2xl text-indigo-500" />
+                        PDF dipilih ✓
+                      </div>
                     ) : (
-                      <img src={filePreview} alt="Preview" className="max-h-32 mx-auto rounded-lg object-contain" />
+                      <img src={filePreview} alt="Preview" className="max-h-32 mx-auto rounded-xl object-contain" />
                     )
                   ) : (
                     <>
-                      <p className="text-xl mb-1">🧾</p>
+                      <Icon icon="solar:camera-add-bold" className="text-3xl text-gray-300 mx-auto mb-2" />
                       <p className="text-sm text-gray-600">Klik untuk pilih foto nota</p>
                       <p className="text-xs text-gray-400 mt-1">JPG, PNG, PDF · Maks 10 MB</p>
                     </>
@@ -182,27 +210,42 @@ export default function AdminPengeluaran() {
               </div>
 
               {error && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-700">{error}</div>
+                <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-700">
+                  <Icon icon="solar:danger-triangle-bold" className="text-red-500 flex-shrink-0" />
+                  {error}
+                </div>
               )}
               {success && (
-                <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-sm text-green-700">{success}</div>
+                <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl p-3 text-sm text-green-700">
+                  <Icon icon="solar:check-circle-bold" className="text-green-500 flex-shrink-0" />
+                  {success}
+                </div>
               )}
 
               <button type="submit" disabled={submitting || compressing} className="btn-primary w-full py-2.5">
-                {submitting ? 'Menyimpan...' : 'Simpan Pengeluaran'}
+                {submitting
+                  ? <span className="flex items-center justify-center gap-2"><Icon icon="solar:spinner-bold" className="animate-spin" />Menyimpan...</span>
+                  : 'Simpan Pengeluaran'
+                }
               </button>
             </form>
           </div>
 
           {/* Info */}
           <div className="space-y-3">
-            <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-sm text-yellow-800">
-              <p className="font-semibold mb-1">⚠️ Perhatian</p>
-              <p>Pengeluaran yang sudah disimpan <strong>tidak dapat dihapus</strong>. Jika ada kesalahan, buat entri koreksi baru.</p>
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Icon icon="solar:danger-triangle-bold" className="text-amber-500 text-lg" />
+                <p className="font-semibold text-sm text-amber-800">Perhatian</p>
+              </div>
+              <p className="text-sm text-amber-700">Pengeluaran yang sudah disimpan <strong>tidak dapat dihapus</strong>. Jika ada kesalahan, buat entri koreksi baru.</p>
             </div>
-            <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-sm text-blue-800">
-              <p className="font-semibold mb-1">📋 Panduan Kategori</p>
-              <ul className="space-y-1 text-xs">
+            <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Icon icon="solar:info-circle-bold" className="text-blue-500 text-lg" />
+                <p className="font-semibold text-sm text-blue-800">Panduan Kategori</p>
+              </div>
+              <ul className="space-y-1 text-xs text-blue-700">
                 <li><strong>Operasional</strong> — listrik, fotokopi, ATK</li>
                 <li><strong>Kegiatan</strong> — acara, konsumsi, dekorasi</li>
                 <li><strong>Peralatan</strong> — beli/sewa peralatan</li>
@@ -212,7 +255,7 @@ export default function AdminPengeluaran() {
           </div>
         </div>
 
-        {/* Tabel Pengeluaran */}
+        {/* Tabel */}
         <div className="card overflow-hidden">
           <div className="p-4 border-b border-gray-100">
             <h2 className="font-semibold text-gray-800">Riwayat Pengeluaran</h2>
@@ -232,25 +275,38 @@ export default function AdminPengeluaran() {
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {loading ? (
-                  <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">Memuat...</td></tr>
+                  <tr>
+                    <td colSpan={6} className="px-4 py-10 text-center">
+                      <Icon icon="solar:spinner-bold" className="text-2xl animate-spin text-gray-300 mx-auto" />
+                    </td>
+                  </tr>
                 ) : expenses.data.length === 0 ? (
-                  <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">Belum ada pengeluaran</td></tr>
+                  <tr>
+                    <td colSpan={6} className="px-4 py-10 text-center text-gray-400">
+                      <Icon icon="solar:inbox-bold" className="text-3xl mx-auto mb-2 text-gray-300" />
+                      <p className="text-sm">Belum ada pengeluaran</p>
+                    </td>
+                  </tr>
                 ) : expenses.data.map((e) => (
-                  <tr key={e.id} className="hover:bg-gray-50">
+                  <tr key={e.id} className="hover:bg-gray-50/80">
                     <td className="px-4 py-3 text-gray-500 whitespace-nowrap text-xs">{formatDateShort(e.date)}</td>
                     <td className="px-4 py-3 max-w-xs">{e.description}</td>
                     <td className="px-4 py-3">
-                      <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">
+                      <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full font-medium">
                         {CATEGORY_LABELS[e.category]}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right font-semibold text-orange-700 whitespace-nowrap">
+                    <td className="px-4 py-3 text-right font-semibold text-orange-600 whitespace-nowrap">
                       {formatRupiah(e.amount)}
                     </td>
                     <td className="px-4 py-3 text-center text-xs text-gray-500">{e.createdBy}</td>
                     <td className="px-4 py-3 text-center">
-                      <button onClick={() => setReceiptModal(e.receiptImageUrl)} className="text-xs text-blue-600 hover:underline">
-                        Lihat Nota
+                      <button
+                        onClick={() => setReceiptModal(e.receiptImageUrl)}
+                        className="inline-flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-700 font-medium"
+                      >
+                        <Icon icon="solar:eye-bold" className="text-sm" />
+                        Lihat
                       </button>
                     </td>
                   </tr>
@@ -260,10 +316,22 @@ export default function AdminPengeluaran() {
           </div>
 
           {expenses.totalPages > 1 && (
-            <div className="p-4 flex justify-center gap-2 border-t border-gray-50">
-              <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)} className="btn-ghost text-xs">← Sebelumnya</button>
-              <span className="text-xs text-gray-500 py-2">{page} / {expenses.totalPages}</span>
-              <button disabled={page >= expenses.totalPages} onClick={() => setPage((p) => p + 1)} className="btn-ghost text-xs">Berikutnya →</button>
+            <div className="p-4 flex justify-center items-center gap-3 border-t border-gray-50">
+              <button
+                disabled={page <= 1}
+                onClick={() => setPage((p) => p - 1)}
+                className="w-8 h-8 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <Icon icon="solar:arrow-left-linear" />
+              </button>
+              <span className="text-xs text-gray-500">{page} / {expenses.totalPages}</span>
+              <button
+                disabled={page >= expenses.totalPages}
+                onClick={() => setPage((p) => p + 1)}
+                className="w-8 h-8 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <Icon icon="solar:arrow-right-linear" />
+              </button>
             </div>
           )}
         </div>
@@ -272,21 +340,29 @@ export default function AdminPengeluaran() {
       {/* Modal Nota */}
       {receiptModal && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={() => setReceiptModal(null)}>
-          <div className="bg-white rounded-2xl max-w-lg w-full overflow-hidden" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-3xl max-w-lg w-full overflow-hidden" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between p-4 border-b">
-              <h3 className="font-semibold">Nota Pengeluaran</h3>
-              <button onClick={() => setReceiptModal(null)} className="text-gray-400 text-xl">×</button>
+              <div className="flex items-center gap-2">
+                <Icon icon="solar:receipt-bold" className="text-gray-400 text-lg" />
+                <h3 className="font-semibold text-gray-900">Nota Pengeluaran</h3>
+              </div>
+              <button
+                onClick={() => setReceiptModal(null)}
+                className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200"
+              >
+                <Icon icon="solar:close-linear" className="text-lg" />
+              </button>
             </div>
             <div className="p-4">
               {receiptModal.endsWith('.pdf') ? (
                 <a href={receiptModal} target="_blank" rel="noreferrer" className="btn-primary w-full block text-center">Buka PDF</a>
               ) : (
-                <img src={receiptModal} alt="Nota" className="w-full rounded-xl" />
+                <img src={receiptModal} alt="Nota" className="w-full rounded-2xl" />
               )}
             </div>
           </div>
         </div>
       )}
-    </div>
+    </AdminLayout>
   );
 }

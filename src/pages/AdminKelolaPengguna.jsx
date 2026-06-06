@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import AdminNav from '../components/AdminNav.jsx';
+import AdminLayout from '../components/AdminLayout.jsx';
 import { api } from '../utils/api.js';
 import { formatDate } from '../utils/format.js';
 import { useAuth } from '../contexts/AuthContext.jsx';
+import { Icon } from '@iconify/react';
 
 const ROLE_BADGE = {
   SUPER_ADMIN: 'bg-purple-100 text-purple-700',
@@ -21,6 +22,7 @@ export default function AdminKelolaPengguna() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
 
   const [addModal, setAddModal] = useState(false);
   const [addForm, setAddForm] = useState(EMPTY_FORM);
@@ -116,23 +118,32 @@ export default function AdminKelolaPengguna() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <AdminNav />
-
-      <main className="max-w-4xl mx-auto px-4 py-6 space-y-4">
+    <AdminLayout>
+      <main className="px-6 py-6 space-y-5">
+        {/* Header */}
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-bold text-gray-900">Kelola Pengguna Admin</h1>
-            <p className="text-xs text-gray-400">{users.length} akun terdaftar</p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-purple-50 flex items-center justify-center">
+              <Icon icon="solar:users-group-two-rounded-bold" className="text-purple-600 text-xl" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-gray-900">Kelola Pengguna Admin</h1>
+              <p className="text-xs text-gray-400">{users.length} akun terdaftar</p>
+            </div>
           </div>
-          <button onClick={() => { setAddModal(true); setAddForm(EMPTY_FORM); setAddError(''); setShowPassword(false); }} className="btn-primary text-sm">
-            + Tambah Admin
+          <button
+            onClick={() => { setAddModal(true); setAddForm(EMPTY_FORM); setAddError(''); setShowPassword(false); }}
+            className="flex items-center gap-2 bg-indigo-600 text-white text-sm font-semibold px-3 py-2 rounded-xl hover:bg-indigo-700 transition-colors"
+          >
+            <Icon icon="solar:user-plus-bold" className="text-base" />
+            Tambah Admin
           </button>
         </div>
 
         {successMsg && (
-          <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-sm text-green-700">
-            ✓ {successMsg}
+          <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl p-3 text-sm text-green-700">
+            <Icon icon="solar:check-circle-bold" className="text-green-500 flex-shrink-0" />
+            {successMsg}
           </div>
         )}
 
@@ -149,14 +160,23 @@ export default function AdminKelolaPengguna() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {loading ? (
-                <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-400">Memuat...</td></tr>
+                <tr>
+                  <td colSpan={5} className="px-4 py-10 text-center">
+                    <Icon icon="solar:spinner-bold" className="text-2xl animate-spin text-gray-300 mx-auto" />
+                  </td>
+                </tr>
               ) : users.map((u) => (
-                <tr key={u.id} className={`hover:bg-gray-50 ${u.username === currentUser?.username ? 'bg-blue-50/30' : ''}`}>
+                <tr key={u.id} className={`hover:bg-gray-50/80 ${u.username === currentUser?.username ? 'bg-indigo-50/30' : ''}`}>
                   <td className="px-4 py-3 font-medium">
-                    {u.username}
-                    {u.username === currentUser?.username && (
-                      <span className="ml-2 text-xs text-gray-400">(Anda)</span>
-                    )}
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                        <Icon icon="solar:user-bold" className="text-gray-400 text-sm" />
+                      </div>
+                      {u.username}
+                      {u.username === currentUser?.username && (
+                        <span className="text-xs text-gray-400 font-normal">(Anda)</span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-4 py-3">
                     <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${ROLE_BADGE[u.role]}`}>
@@ -169,24 +189,27 @@ export default function AdminKelolaPengguna() {
                   </td>
                   <td className="px-4 py-3">
                     {u.username !== currentUser?.username ? (
-                      <div className="flex gap-1 justify-center flex-wrap">
+                      <div className="flex gap-1.5 justify-center">
                         <button
                           onClick={() => { setRoleModal(u); setSelectedRole(u.role); }}
-                          className="text-xs px-2 py-1 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50"
+                          title="Ubah Role"
+                          className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 flex items-center justify-center transition-colors"
                         >
-                          Ubah Role
+                          <Icon icon="solar:shield-user-bold" className="text-base" />
                         </button>
                         <button
-                          onClick={() => { setResetModal(u); setNewPassword(''); }}
-                          className="text-xs px-2 py-1 rounded-lg border border-yellow-200 text-yellow-700 hover:bg-yellow-50"
+                          onClick={() => { setResetModal(u); setNewPassword(''); setShowResetPassword(false); }}
+                          title="Reset Password"
+                          className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 flex items-center justify-center transition-colors"
                         >
-                          Reset Password
+                          <Icon icon="solar:key-bold" className="text-base" />
                         </button>
                         <button
                           onClick={() => setDeleteTarget(u)}
-                          className="text-xs px-2 py-1 rounded-lg border border-red-200 text-red-600 hover:bg-red-50"
+                          title="Hapus"
+                          className="w-8 h-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 flex items-center justify-center transition-colors"
                         >
-                          Hapus
+                          <Icon icon="solar:trash-bin-trash-bold" className="text-base" />
                         </button>
                       </div>
                     ) : (
@@ -199,9 +222,12 @@ export default function AdminKelolaPengguna() {
           </table>
         </div>
 
-        <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-sm text-yellow-800">
-          <p className="font-semibold mb-1">⚠️ Panduan</p>
-          <ul className="list-disc list-inside space-y-1 text-xs">
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Icon icon="solar:danger-triangle-bold" className="text-amber-500 text-lg" />
+            <p className="font-semibold text-sm text-amber-800">Panduan</p>
+          </div>
+          <ul className="list-disc list-inside space-y-1 text-xs text-amber-700">
             <li><strong>Super Admin</strong> dapat mengakses semua fitur termasuk halaman ini.</li>
             <li><strong>Admin</strong> hanya dapat verifikasi donasi dan input pengeluaran.</li>
             <li>Anda tidak dapat menghapus atau mengubah akun Anda sendiri di sini.</li>
@@ -213,8 +239,13 @@ export default function AdminKelolaPengguna() {
       {/* Modal Tambah Admin */}
       {addModal && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm p-6">
-            <h3 className="font-semibold mb-4">Tambah Admin Baru</h3>
+          <div className="bg-white rounded-3xl w-full max-w-sm p-6">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center">
+                <Icon icon="solar:user-plus-bold" className="text-indigo-600 text-xl" />
+              </div>
+              <h3 className="font-bold text-gray-900">Tambah Admin Baru</h3>
+            </div>
             <form onSubmit={handleAdd} className="space-y-3">
               <div>
                 <label className="label">Username</label>
@@ -244,16 +275,7 @@ export default function AdminKelolaPengguna() {
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                     tabIndex={-1}
                   >
-                    {showPassword ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 4.411m0 0L21 21" />
-                      </svg>
-                    ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    )}
+                    <Icon icon={showPassword ? 'solar:eye-closed-linear' : 'solar:eye-linear'} className="text-lg" />
                   </button>
                 </div>
               </div>
@@ -269,7 +291,10 @@ export default function AdminKelolaPengguna() {
                 </select>
               </div>
               {addError && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-2 text-xs text-red-700">{addError}</div>
+                <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl p-2 text-xs text-red-700">
+                  <Icon icon="solar:danger-triangle-bold" className="text-red-500 flex-shrink-0" />
+                  {addError}
+                </div>
               )}
               <div className="flex gap-2 pt-1">
                 <button type="button" onClick={() => setAddModal(false)} className="btn-ghost flex-1">Batal</button>
@@ -285,9 +310,16 @@ export default function AdminKelolaPengguna() {
       {/* Modal Ubah Role */}
       {roleModal && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm p-6">
-            <h3 className="font-semibold mb-1">Ubah Role</h3>
-            <p className="text-sm text-gray-500 mb-4">Akun: <strong>{roleModal.username}</strong></p>
+          <div className="bg-white rounded-3xl w-full max-w-sm p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center">
+                <Icon icon="solar:shield-user-bold" className="text-indigo-600 text-xl" />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900">Ubah Role</h3>
+                <p className="text-xs text-gray-500">Akun: <strong>{roleModal.username}</strong></p>
+              </div>
+            </div>
             <label className="label">Role Baru</label>
             <select
               value={selectedRole}
@@ -308,17 +340,34 @@ export default function AdminKelolaPengguna() {
       {/* Modal Reset Password */}
       {resetModal && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm p-6">
-            <h3 className="font-semibold mb-1">Reset Password</h3>
-            <p className="text-sm text-gray-500 mb-4">Akun: <strong>{resetModal.username}</strong></p>
+          <div className="bg-white rounded-3xl w-full max-w-sm p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-2xl bg-amber-50 flex items-center justify-center">
+                <Icon icon="solar:key-bold" className="text-amber-600 text-xl" />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900">Reset Password</h3>
+                <p className="text-xs text-gray-500">Akun: <strong>{resetModal.username}</strong></p>
+              </div>
+            </div>
             <label className="label">Password Baru</label>
-            <input
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Minimal 8 karakter"
-              className="input mb-4"
-            />
+            <div className="relative mb-4">
+              <input
+                type={showResetPassword ? 'text' : 'password'}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Minimal 8 karakter"
+                className="input pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowResetPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                tabIndex={-1}
+              >
+                <Icon icon={showResetPassword ? 'solar:eye-closed-linear' : 'solar:eye-linear'} className="text-lg" />
+              </button>
+            </div>
             <div className="flex gap-2">
               <button onClick={() => setResetModal(null)} className="btn-ghost flex-1">Batal</button>
               <button onClick={handleReset} disabled={resetLoading} className="btn-primary flex-1">
@@ -329,15 +378,16 @@ export default function AdminKelolaPengguna() {
         </div>
       )}
 
-      {/* Modal Konfirmasi Hapus */}
+      {/* Modal Hapus */}
       {deleteTarget && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm p-6 text-center">
-            <p className="text-3xl mb-3">🗑️</p>
-            <h3 className="font-semibold mb-1">Hapus Akun</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              Yakin ingin menghapus akun <strong>{deleteTarget.username}</strong>?
-              Tindakan ini tidak dapat dibatalkan.
+          <div className="bg-white rounded-3xl w-full max-w-sm p-6 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center mx-auto mb-4">
+              <Icon icon="solar:trash-bin-trash-bold" className="text-red-500 text-2xl" />
+            </div>
+            <h3 className="font-bold text-gray-900 mb-1">Hapus Akun</h3>
+            <p className="text-sm text-gray-500 mb-5">
+              Yakin ingin menghapus akun <strong>{deleteTarget.username}</strong>? Tindakan ini tidak dapat dibatalkan.
             </p>
             <div className="flex gap-2">
               <button onClick={() => setDeleteTarget(null)} className="btn-ghost flex-1">Batal</button>
@@ -348,6 +398,6 @@ export default function AdminKelolaPengguna() {
           </div>
         </div>
       )}
-    </div>
+    </AdminLayout>
   );
 }
