@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../utils/api.js';
 import { compressImage } from '../utils/imageCompressor.js';
@@ -37,11 +37,22 @@ const StepIndicator = ({ current }) => (
   </div>
 );
 
+const SESSION_KEY = 'formIuran';
+
+function loadSession() {
+  try { return JSON.parse(sessionStorage.getItem(SESSION_KEY)) || {}; } catch { return {}; }
+}
+
+function clearSession() {
+  sessionStorage.removeItem(SESSION_KEY);
+}
+
 export default function FormIuran() {
-  const [step, setStep] = useState(1);
-  const [payMethod, setPayMethod] = useState('qris');
-  const [selectedBank, setSelectedBank] = useState('bca');
-  const [form, setForm] = useState({
+  const saved = loadSession();
+  const [step, setStep] = useState(saved.step || 1);
+  const [payMethod, setPayMethod] = useState(saved.payMethod || 'qris');
+  const [selectedBank, setSelectedBank] = useState(saved.selectedBank || 'bca');
+  const [form, setForm] = useState(saved.form || {
     nama: '',
     noTelepon: '',
     nominal: '',
@@ -53,6 +64,10 @@ export default function FormIuran() {
   const [status, setStatus] = useState('idle');
   const [error, setError] = useState('');
   const [compressing, setCompressing] = useState(false);
+
+  useEffect(() => {
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify({ step, payMethod, selectedBank, form }));
+  }, [step, payMethod, selectedBank, form]);
   const [copied, setCopied] = useState(false);
 
   const handleChange = (e) => {
@@ -116,6 +131,7 @@ export default function FormIuran() {
       formData.append('isAnonymous', String(form.isAnonymous));
       formData.append('buktiTransfer', file);
       await api.postForm('/public/contributions', formData);
+      clearSession();
       setStatus('success');
     } catch (err) {
       setError(err.message || 'Gagal mengirim. Coba lagi.');
@@ -150,8 +166,11 @@ export default function FormIuran() {
               </Link>
               <button
                 onClick={() => {
+                  clearSession();
                   setStatus('idle');
                   setStep(1);
+                  setPayMethod('qris');
+                  setSelectedBank('bca');
                   setFile(null);
                   setFilePreview(null);
                   setForm({ nama: '', noTelepon: '', nominal: '', catatan: '', isAnonymous: false });
