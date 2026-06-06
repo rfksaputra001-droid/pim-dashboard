@@ -9,6 +9,7 @@ const AdminLogin = lazy(() => import('./pages/AdminLogin.jsx'));
 const AdminIuran = lazy(() => import('./pages/AdminIuran.jsx'));
 const AdminPengeluaran = lazy(() => import('./pages/AdminPengeluaran.jsx'));
 const AdminKelolaPengguna = lazy(() => import('./pages/AdminKelolaPengguna.jsx'));
+const Pengeluaran = lazy(() => import('./pages/Pengeluaran.jsx'));
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/setor" element={<FormIuran />} />
+            <Route path="/pengeluaran" element={<Pengeluaran />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route
               path="/admin/iuran"
