@@ -71,7 +71,10 @@ export default function FormIuran() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setForm((f) => ({ ...f, [name]: type === 'checkbox' ? checked : value }));
+    const val = type === 'checkbox' ? checked
+      : name === 'nama' ? value.replace(/(^|\s)\S/g, (c) => c.toUpperCase())
+      : value;
+    setForm((f) => ({ ...f, [name]: val }));
   };
 
   const handleFile = async (e) => {
