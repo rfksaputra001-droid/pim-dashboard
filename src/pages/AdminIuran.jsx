@@ -171,7 +171,7 @@ export default function AdminIuran() {
                     </td>
                     <td className="px-4 py-3 text-center">
                       <button
-                        onClick={() => setProofModal(c.proofImageUrl)}
+                        onClick={() => setProofModal({ url: c.proofImageUrl, name: c.name, amount: c.amount, date: c.createdAt })}
                         className="inline-flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-700 font-medium"
                       >
                         <Icon icon="solar:eye-bold" className="text-sm" />
@@ -282,10 +282,15 @@ export default function AdminIuran() {
       {proofModal && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={() => setProofModal(null)}>
           <div className="bg-white rounded-3xl max-w-lg w-full overflow-hidden" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-4 border-b">
-              <div className="flex items-center gap-2">
-                <Icon icon="solar:document-bold" className="text-gray-400 text-lg" />
-                <h3 className="font-semibold text-gray-900">Bukti Transfer</h3>
+            <div className="flex items-center justify-between p-4 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center">
+                  <Icon icon="solar:document-bold" className="text-indigo-500 text-lg" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 text-sm">Bukti Transfer</h3>
+                  <p className="text-xs text-gray-400">{proofModal.name} · {formatRupiah(proofModal.amount)}</p>
+                </div>
               </div>
               <button
                 onClick={() => setProofModal(null)}
@@ -295,13 +300,26 @@ export default function AdminIuran() {
               </button>
             </div>
             <div className="p-4">
-              {proofModal.includes('.pdf') ? (
-                <a href={proofModal} target="_blank" rel="noreferrer" className="btn-primary w-full block text-center">
+              {proofModal.url.includes('.pdf') ? (
+                <a href={proofModal.url} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 w-full bg-indigo-600 text-white font-semibold py-3 rounded-2xl hover:bg-indigo-700 transition-colors">
+                  <Icon icon="solar:document-bold" />
                   Buka PDF
                 </a>
               ) : (
-                <img src={proofModal} alt="Bukti" className="w-full rounded-2xl" />
+                <img src={proofModal.url} alt="Bukti Transfer" className="w-full max-h-[60vh] object-contain rounded-2xl bg-gray-50" />
               )}
+            </div>
+            <div className="px-4 pb-4">
+              <a
+                href={proofModal.url}
+                download
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-center gap-2 w-full border border-gray-200 text-gray-600 font-medium py-2.5 rounded-2xl hover:bg-gray-50 transition-colors text-sm"
+              >
+                <Icon icon="solar:download-minimalistic-bold" />
+                Unduh Bukti
+              </a>
             </div>
           </div>
         </div>
