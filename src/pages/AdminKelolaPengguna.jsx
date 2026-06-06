@@ -203,7 +203,7 @@ export default function AdminKelolaPengguna() {
           <p className="font-semibold mb-1">⚠️ Panduan</p>
           <ul className="list-disc list-inside space-y-1 text-xs">
             <li><strong>Super Admin</strong> dapat mengakses semua fitur termasuk halaman ini.</li>
-            <li><strong>Admin</strong> hanya dapat verifikasi iuran dan input pengeluaran.</li>
+            <li><strong>Admin</strong> hanya dapat verifikasi donasi dan input pengeluaran.</li>
             <li>Anda tidak dapat menghapus atau mengubah akun Anda sendiri di sini.</li>
             <li>Pastikan selalu ada minimal satu Super Admin aktif.</li>
           </ul>

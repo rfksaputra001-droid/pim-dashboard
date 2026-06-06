@@ -27,7 +27,7 @@ export default function AdminNav() {
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-20">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
         <div className="flex items-center gap-1">
-          <Link to="/admin/iuran" className={linkClass('/admin/iuran')}>Iuran</Link>
+          <Link to="/admin/iuran" className={linkClass('/admin/iuran')}>Donasi</Link>
           <Link to="/admin/pengeluaran" className={linkClass('/admin/pengeluaran')}>Pengeluaran</Link>
           {user?.role === 'SUPER_ADMIN' && (
             <Link to="/admin/pengguna" className={linkClass('/admin/pengguna')}>

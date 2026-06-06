@@ -32,7 +32,7 @@ export default function AdminIuran() {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const handleVerify = async (id) => {
-    if (!confirm('Verifikasi iuran ini?')) return;
+    if (!confirm('Verifikasi pembayaran ini?')) return;
     setActionLoading(id + '-verify');
     try {
       const { waLink: link } = await api.patch(`/admin/contributions/${id}/verify`, {});
@@ -67,7 +67,7 @@ export default function AdminIuran() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `laporan-iuran-${new Date().toISOString().split('T')[0]}.csv`;
+      a.download = `laporan-donasi-${new Date().toISOString().split('T')[0]}.csv`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
@@ -82,7 +82,7 @@ export default function AdminIuran() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-bold text-gray-900">Manajemen Iuran</h1>
+            <h1 className="text-lg font-bold text-gray-900">Manajemen Donasi</h1>
             <p className="text-xs text-gray-400">{contributions.total} total transaksi</p>
           </div>
           <button onClick={handleExport} className="btn-ghost text-xs">
@@ -198,7 +198,7 @@ export default function AdminIuran() {
       {rejectModal && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-sm p-6">
-            <h3 className="font-semibold mb-3">Tolak Iuran</h3>
+            <h3 className="font-semibold mb-3">Tolak Pembayaran</h3>
             <label className="label">Alasan Penolakan</label>
             <textarea
               value={rejectReason}
