@@ -309,18 +309,6 @@ export default function AdminIuran() {
                 <img src={proofModal.url} alt="Bukti Transfer" className="w-full max-h-[60vh] object-contain rounded-2xl bg-gray-50" />
               )}
             </div>
-            <div className="px-4 pb-4">
-              <a
-                href={proofModal.url}
-                download
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center justify-center gap-2 w-full border border-gray-200 text-gray-600 font-medium py-2.5 rounded-2xl hover:bg-gray-50 transition-colors text-sm"
-              >
-                <Icon icon="solar:download-minimalistic-bold" />
-                Unduh Bukti
-              </a>
-            </div>
           </div>
         </div>
       )}
