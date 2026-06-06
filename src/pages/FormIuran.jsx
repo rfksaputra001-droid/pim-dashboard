@@ -57,7 +57,6 @@ export default function FormIuran() {
     noTelepon: '',
     nominal: '',
     catatan: '',
-    isAnonymous: false,
   });
   const [file, setFile] = useState(null);
   const [filePreview, setFilePreview] = useState(null);
@@ -95,7 +94,7 @@ export default function FormIuran() {
   const validateStep = () => {
     setError('');
     if (step === 1) {
-      if (!form.isAnonymous && !form.nama.trim()) { setError('Nama wajib diisi'); return false; }
+      if (!form.nama.trim()) { setError('Nama wajib diisi'); return false; }
       if (!form.noTelepon.trim()) { setError('Nomor WhatsApp wajib diisi'); return false; }
     }
     if (step === 2) {
@@ -128,7 +127,6 @@ export default function FormIuran() {
       formData.append('noTelepon', form.noTelepon.trim());
       formData.append('nominal', String(nominal));
       formData.append('catatan', form.catatan.trim());
-      formData.append('isAnonymous', String(form.isAnonymous));
       formData.append('buktiTransfer', file);
       await api.postForm('/public/contributions', formData);
       clearSession();
@@ -173,7 +171,7 @@ export default function FormIuran() {
                   setSelectedBank('bca');
                   setFile(null);
                   setFilePreview(null);
-                  setForm({ nama: '', noTelepon: '', nominal: '', catatan: '', isAnonymous: false });
+                  setForm({ nama: '', noTelepon: '', nominal: '', catatan: '' });
                 }}
                 className="flex-1 bg-gradient-to-r from-emerald-500 to-green-400 text-white rounded-2xl py-3 text-sm font-bold shadow-md shadow-green-200/60"
               >
@@ -223,22 +221,11 @@ export default function FormIuran() {
                 <input
                   type="text"
                   name="nama"
-                  value={form.isAnonymous ? '' : form.nama}
+                  value={form.nama}
                   onChange={handleChange}
-                  disabled={form.isAnonymous}
-                  placeholder={form.isAnonymous ? 'Hamba Allah' : 'Nama lengkap Anda'}
-                  className="input disabled:bg-gray-50 disabled:text-gray-400"
+                  placeholder="Nama lengkap Anda"
+                  className="input"
                 />
-                <label className="flex items-center gap-2 mt-2 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    name="isAnonymous"
-                    checked={form.isAnonymous}
-                    onChange={handleChange}
-                    className="rounded"
-                  />
-                  <span className="text-sm text-gray-600">Anonim / Hamba Allah</span>
-                </label>
               </div>
 
               <div>
