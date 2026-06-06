@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../utils/api.js';
-import { formatRupiah } from '../utils/format.js';
+import { formatRupiah, formatDateShort, CATEGORY_LABELS } from '../utils/format.js';
 
 const rankBadge = (rank) => {
   if (rank === 1) return <span className="text-2xl">🥇</span>;
@@ -22,11 +22,22 @@ const amountClass = (rank) => {
   return 'text-sm font-bold text-green-700';
 };
 
+const CATEGORY_COLORS = {
+  OPERASIONAL: 'bg-blue-100 text-blue-700',
+  KEGIATAN:    'bg-purple-100 text-purple-700',
+  PERALATAN:   'bg-orange-100 text-orange-700',
+  LAIN_LAIN:   'bg-gray-100 text-gray-600',
+};
+
 export default function Dashboard() {
   const [summary, setSummary] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
+
+  const [expenseModal, setExpenseModal] = useState(false);
+  const [expenses, setExpenses] = useState([]);
+  const [expensesLoading, setExpensesLoading] = useState(false);
 
   const fetchAll = useCallback(async () => {
     try {
@@ -50,6 +61,20 @@ export default function Dashboard() {
     const timer = setInterval(fetchAll, 60_000);
     return () => clearInterval(timer);
   }, [fetchAll]);
+
+  const openExpenseModal = async () => {
+    setExpenseModal(true);
+    if (expenses.length > 0) return;
+    setExpensesLoading(true);
+    try {
+      const data = await api.get('/public/expenses?page=1');
+      setExpenses(data.data || []);
+    } catch {
+      // silent — modal tetap buka
+    } finally {
+      setExpensesLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -84,7 +109,6 @@ export default function Dashboard() {
 
         {/* Hero card */}
         <div className="relative bg-gradient-to-br from-blue-700 to-indigo-700 rounded-3xl shadow-xl px-6 py-6 text-white text-center overflow-hidden">
-          {/* Decorative circles */}
           <div className="absolute -top-6 -right-6 w-32 h-32 bg-white/10 rounded-full" />
           <div className="absolute -bottom-10 -left-8 w-40 h-40 bg-white/5 rounded-full" />
           <div className="absolute top-4 left-4 w-10 h-10 bg-white/5 rounded-full" />
@@ -108,6 +132,30 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Ringkasan keuangan */}
+        <div className="bg-white rounded-3xl shadow-sm px-5 py-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-red-50 rounded-2xl px-4 py-3">
+              <p className="text-xs text-red-400 font-medium mb-1">Total Pengeluaran</p>
+              <p className="text-base font-black text-red-600 leading-tight">
+                {formatRupiah(summary?.totalExpenses || 0)}
+              </p>
+            </div>
+            <div className="bg-emerald-50 rounded-2xl px-4 py-3">
+              <p className="text-xs text-emerald-500 font-medium mb-1">Saldo Kas</p>
+              <p className="text-base font-black text-emerald-600 leading-tight">
+                {formatRupiah(summary?.balance || 0)}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={openExpenseModal}
+            className="mt-3 w-full text-center text-xs text-indigo-600 font-semibold hover:text-indigo-700"
+          >
+            Lihat riwayat pengeluaran →
+          </button>
+        </div>
+
         {/* Leaderboard */}
         <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
           <div className="px-4 py-3.5 border-b border-gray-100 flex items-center gap-2">
@@ -122,7 +170,7 @@ export default function Dashboard() {
               <p className="text-center text-gray-400 text-sm py-10">Belum ada donatur</p>
             ) : leaderboard.map((item) => (
               <div
-                key={item.name}
+                key={item.rank}
                 className={`flex items-center gap-3 px-4 py-3 border-b last:border-0 ${rowClass(item.rank)}`}
               >
                 <span className="min-w-[32px] flex justify-center">
@@ -149,6 +197,54 @@ export default function Dashboard() {
         </div>
 
       </main>
+
+      {/* Modal Riwayat Pengeluaran */}
+      {expenseModal && (
+        <div
+          className="fixed inset-0 bg-black/60 z-50 flex items-end justify-center"
+          onClick={() => setExpenseModal(false)}
+        >
+          <div
+            className="bg-white w-full max-w-md rounded-t-3xl max-h-[80vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+              <div>
+                <h3 className="font-bold text-gray-900">Riwayat Pengeluaran</h3>
+                <p className="text-xs text-gray-400 mt-0.5">Total {formatRupiah(summary?.totalExpenses || 0)}</p>
+              </div>
+              <button
+                onClick={() => setExpenseModal(false)}
+                className="text-2xl text-gray-300 hover:text-gray-500 leading-none"
+              >
+                ×
+              </button>
+            </div>
+            <div className="overflow-y-auto flex-1 px-5 py-3 space-y-2">
+              {expensesLoading ? (
+                <p className="text-center text-gray-400 text-sm py-10">Memuat...</p>
+              ) : expenses.length === 0 ? (
+                <p className="text-center text-gray-400 text-sm py-10">Belum ada pengeluaran</p>
+              ) : expenses.map((e) => (
+                <div key={e.id} className="flex items-start gap-3 py-3 border-b border-gray-50 last:border-0">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-800 truncate">{e.description}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-gray-400">{formatDateShort(e.date)}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${CATEGORY_COLORS[e.category]}`}>
+                        {CATEGORY_LABELS[e.category]}
+                      </span>
+                    </div>
+                  </div>
+                  <span className="text-sm font-bold text-red-500 whitespace-nowrap">
+                    -{formatRupiah(e.amount)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
