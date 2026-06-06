@@ -69,11 +69,14 @@ export default function Pengeluaran() {
                 >
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-gray-800">{e.description}</p>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
                       <span className="text-xs text-gray-400">{formatDateShort(e.date)}</span>
                       <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${CATEGORY_COLORS[e.category]}`}>
                         {CATEGORY_LABELS[e.category]}
                       </span>
+                      {e.createdBy && (
+                        <span className="text-xs text-gray-400">· {e.createdBy}</span>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
@@ -124,11 +127,14 @@ export default function Pengeluaran() {
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-gray-900 text-base">{selected.description}</p>
-                  <div className="flex items-center gap-2 mt-1.5">
+                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                     <span className="text-xs text-gray-400">{formatDateShort(selected.date)}</span>
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${CATEGORY_COLORS[selected.category]}`}>
                       {CATEGORY_LABELS[selected.category]}
                     </span>
+                    {selected.createdBy && (
+                      <span className="text-xs text-gray-400">· Dicatat oleh <strong className="text-gray-600">{selected.createdBy}</strong></span>
+                    )}
                   </div>
                 </div>
                 <span className="text-lg font-black text-red-500 whitespace-nowrap">
