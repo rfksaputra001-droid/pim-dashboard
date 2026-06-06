@@ -296,7 +296,7 @@ export default function AdminIuran() {
                 onClick={() => setProofModal(null)}
                 className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200"
               >
-                <Icon icon="solar:close-linear" className="text-lg" />
+                <Icon icon="solar:close-square-bold" className="text-base" />
               </button>
             </div>
             <div className="p-4">
